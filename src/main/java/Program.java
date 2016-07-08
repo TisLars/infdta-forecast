@@ -10,44 +10,23 @@ import java.util.ArrayList;
  */
 public class Program {
 
-    public static ArrayList<Integer> data;
-    private static double alpha;
+    public static ArrayList<Double> data;
+    private static double dataSmootingFactor;
+    private static double trendSmootingFactor;
 
     public static void main(String[] args) {
-        try {
-            alpha = initAlpha();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
         ReadData readData = new ReadData();
         data = readData.read();
 
-        double[] forecastData = computeForecast(data);
-        ChartGenerator chart = new ChartGenerator("Line chart", "Swords forecast", forecastData);
+        SES ses = new SES(data, .8);
+        DES des = new DES(data, .8, .4);
 
-        chart.pack();
-        RefineryUtilities.centerFrameOnScreen(chart);
-        chart.setVisible(true);
-    }
-
-    private static double[] computeForecast(ArrayList<Integer> data) {
-        int timeValue;
-        double smoothValue[] = new double[data.size()];
-        int count = 0;
-
-        for (Integer dataValue : data) {
-            if (count > 0)
-                smoothValue[count] = alpha * (dataValue) + (1 - alpha) * (smoothValue[count - 1]);
-            System.out.println(dataValue + "\t" + smoothValue[count]);
-            count++;
-        }
-
-        return smoothValue;
+//        generateCharts("Line Chart", "Swords forecast SES", ses.getForecastData());
+        generateCharts("Line Chart", "Swords forecast DES", des.getForecastData());
     }
 
     private static Double initAlpha() throws IOException {
-        System.out.println("value of alpha: ");
+        System.out.println("value of dataSmootingFactor: ");
         double value = 0;
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         try {
@@ -59,7 +38,15 @@ public class Program {
         return value;
     }
 
-    public ArrayList<Integer> getCsvData() {
+    private static void generateCharts(String appTitle, String chartTitle, double[] data) {
+        ChartGenerator chart = new ChartGenerator(appTitle, chartTitle, data);
+
+        chart.pack();
+        RefineryUtilities.centerFrameOnScreen(chart);
+        chart.setVisible(true);
+    }
+
+    public ArrayList<Double> getOriginalData() {
         return data;
     }
 }

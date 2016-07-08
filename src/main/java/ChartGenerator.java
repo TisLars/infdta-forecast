@@ -20,7 +20,7 @@ public class ChartGenerator extends ApplicationFrame {
                 true, true, false);
 
         ChartPanel chartPanel = new ChartPanel(lineChart);
-        chartPanel.setPreferredSize(new java.awt.Dimension(600, 400));
+        chartPanel.setPreferredSize(new java.awt.Dimension(800, 600));
         setContentPane(chartPanel);
     }
 
@@ -29,7 +29,8 @@ public class ChartGenerator extends ApplicationFrame {
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
         int day = 0;
         for (Double value : data) {
-            dataset.addValue(program.getCsvData().get(day), "Smoothing", "" + day + "");
+            if (day < program.getOriginalData().size())
+                dataset.addValue(program.getOriginalData().get(day), "Smoothing", "" + day + "");
             dataset.addValue(value, "Swords", "" + day + "");
             day++;
         }
