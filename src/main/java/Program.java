@@ -18,10 +18,10 @@ public class Program {
         ReadData readData = new ReadData();
         data = readData.read();
 
-        SES ses = new SES(data, .8);
-        DES des = new DES(data, .8, .4);
+        SES ses = new SES(data);
+        DES des = new DES(data);
 
-//        generateCharts("Line Chart", "Swords forecast SES", ses.getForecastData());
+//        generateCharts("Line Chart", "Swords forecast SES", ses.getSmoothingData());
         generateCharts("Line Chart", "Swords forecast DES", des.getForecastData());
     }
 
