@@ -6,14 +6,13 @@ import java.util.ArrayList;
 public class DES {
 
     private ArrayList<Double> data;
-    private double[] forecastData;
-    private final int FORECASTPERIOD = 12;
+    private double[] forecastData, smoothingData, trendData;
     private double alpha, trend;
     private double sumSquaredErrors, newSumSquaredErrors;
 
-    public DES(ArrayList<Double> data) {
+    public DES(ArrayList<Double> data, int forecastPeriod) {
         this.data = data;
-        this.forecastData = new double[data.size() + FORECASTPERIOD];
+        this.forecastData = new double[data.size() + forecastPeriod];
         this.sumSquaredErrors = Double.MAX_VALUE;
 
         for (double i = 0.01; i < 1; i += .01) {
@@ -28,15 +27,14 @@ public class DES {
             }
         }
         computeForecast(alpha, trend);
-        System.out.println(calculateSSE());
-        System.out.println(data.size());
+
+        System.out.println("DES: \'alpha\': " + this.alpha + "\t\'trend\': " + trend + "\t\'SSE\': " + calculateSSE());
     }
 
     private void computeForecast(double alpha, double trend) {
-        double[] smoothingData = new double[data.size()];
+        smoothingData = new double[data.size()];
+        trendData = new double[data.size()];
 
-        System.out.println(smoothingData.length);
-        double[] trendData = new double[data.size()];
         smoothingData[1] = data.get(1);
         trendData[1] = data.get(0) - data.get(1);
 
@@ -47,22 +45,33 @@ public class DES {
 
         for (int i = 0; i < forecastData.length; i++) {
             if (i < 2)
-                forecastData[i] = (smoothingData[1] + smoothingData[19]) / 2;
-            else if (i > smoothingData.length)
+                forecastData[i] = 177;
+            else if (i >= smoothingData.length)
                 forecastData[i] = smoothingData[data.size() - 1] + (i - data.size()) * trendData[data.size() - 1];
             else
-                forecastData[i] = smoothingData[i - 1] + trendData[i - 1];
+                forecastData[i] = smoothingData[i-1] + trendData[i-1];
         }
     }
 
     public double calculateSSE() {
         double sum = 0;
         for (int i = 0; i < data.size(); i++) {
-            sum += (Math.pow(forecastData[i] - data.get(i), 2)) / (data.size() - 3);
+            sum += (Math.pow(forecastData[i] - data.get(i), 2)) / (data.size() - 2);
         }
         double error = Math.sqrt(sum);
 
         return error;
+    }
+
+    public double[] getData() {
+        double result[] = new double[forecastData.length];
+        for (int i=0;i<result.length;i++) {
+            if (i< data.size())
+                result[i] = smoothingData[i];
+            else
+                result[i] = forecastData[i];
+        }
+        return result;
     }
 
     public double[] getForecastData() {

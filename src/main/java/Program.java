@@ -1,8 +1,5 @@
 import org.jfree.ui.RefineryUtilities;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 /**
@@ -11,31 +8,16 @@ import java.util.ArrayList;
 public class Program {
 
     public static ArrayList<Double> data;
-    private static double dataSmootingFactor;
-    private static double trendSmootingFactor;
 
     public static void main(String[] args) {
         ReadData readData = new ReadData();
         data = readData.read();
 
-        SES ses = new SES(data);
-        DES des = new DES(data);
+        SES ses = new SES(data, 12);
+        DES des = new DES(data, 12);
 
-//        generateCharts("Line Chart", "Swords forecast SES", ses.getSmoothingData());
+        generateCharts("Line Chart", "Swords forecast SES", ses.getSmoothingData());
         generateCharts("Line Chart", "Swords forecast DES", des.getForecastData());
-    }
-
-    private static Double initAlpha() throws IOException {
-        System.out.println("value of dataSmootingFactor: ");
-        double value = 0;
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        try {
-            value = Double.parseDouble(br.readLine());
-        } catch (NumberFormatException nfe) {
-            System.err.println("Invalid Format!");
-        }
-
-        return value;
     }
 
     private static void generateCharts(String appTitle, String chartTitle, double[] data) {

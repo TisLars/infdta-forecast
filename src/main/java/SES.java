@@ -10,9 +10,9 @@ public class SES {
     private double alpha;
     private double sumSquaredErrors, newSumSquaredErrors;
 
-    public SES(ArrayList<Double> data) {
+    public SES(ArrayList<Double> data, int forecastPeriod) {
         this.data = data;
-        this.smoothingData = new double[data.size()];
+        this.smoothingData = new double[data.size() + forecastPeriod];
         this.sumSquaredErrors = Double.MAX_VALUE;
 
         for (double i = 0.01; i < 1; i += .01) {
@@ -23,7 +23,8 @@ public class SES {
                 this.alpha = i;
             }
         }
-        computeForecast(this.alpha);
+        computeForecast(alpha);
+        System.out.println("SES: \'alpha\': " + this.alpha + "\t\t\t\t\t\'SSE\': " + calculateSSE());
     }
 
     private void computeForecast(double alpha) {
@@ -34,12 +35,14 @@ public class SES {
             smoothingData[count] = (alpha * data.get(i - 1)) + (1 - alpha) * smoothingData[count - 1];
             count++;
         }
+        for (int i = data.size(); i < smoothingData.length; i++)
+            smoothingData[i] = smoothingData[i - 1];
     }
 
     public double calculateSSE() {
         double sum = 0;
         for (int i = 0; i < data.size(); i++) {
-            sum += (Math.pow(smoothingData[i] - data.get(i), 2)) / (data.size() - 2);
+            sum += (Math.pow(smoothingData[i] - data.get(i), 2)) / (data.size() - 1);
         }
         double error = Math.sqrt(sum);
 
